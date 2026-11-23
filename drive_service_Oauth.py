@@ -159,7 +159,7 @@ def move_user_files_to_permanent(credentials_dict, user_email):
         )
         moved_files.append(moved)
 
-    print("moved file result:", moved)
+    print("moved file result:", moved_files)
 
     return moved_files
 
