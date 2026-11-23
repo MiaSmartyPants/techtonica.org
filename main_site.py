@@ -506,6 +506,7 @@ def send_posting():
     )
 
 
+
 @app.route("/upload-household-files", methods=["POST"])
 def upload_household_files():
     credentials = session["credentials"]
@@ -517,24 +518,35 @@ def upload_household_files():
 
     income_files = request.files.getlist("income-verification-docs")
     networth_files = request.files.getlist("net-worth-docs")
+    failed_files = []
 
     for idx, file in enumerate(income_files):
         if file and file.filename:
-            upload(
+            result = upload(
                 credentials,
                 folder_id,
                 file,
                 f"Income_{user_email}_{idx}_{file.filename}",
             )
+            if not result:
+                failed_files.append(file.filename)
 
     for idx, file in enumerate(networth_files):
         if file and file.filename:
-            upload(
+            result = upload(
                 credentials,
                 folder_id,
                 file,
                 f"NetWorth_{user_email}_{idx}_{file.filename}",
             )
+            if not result:
+                failed_files.append(file.filename)
+
+    if failed_files:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to upload: {', '.join(failed_files)}",
+        }), 500
 
     return jsonify({"success": True})
 
@@ -564,14 +576,25 @@ def upload_additional_files():
 
     typing_file = request.files.get("typing-test-screenshot")
     fcc_file = request.files.get("FCC-screenshot")
+    failed_files = []
 
     if typing_file and typing_file.filename:
         typing_new_name = f"TypingTest_{user_email}_{typing_file.filename}"
-        upload(credentials, folder_id, typing_file, typing_new_name)
+        result = upload(credentials, folder_id, typing_file, typing_new_name)
+        if not result:
+            failed_files.append(typing_file.filename)
 
     if fcc_file and fcc_file.filename:
         fcc_new_name = f"FCC_{user_email}_{fcc_file.filename}"
-        upload(credentials, folder_id, fcc_file, fcc_new_name)
+        result = upload(credentials, folder_id, fcc_file, fcc_new_name)
+        if not result:
+            failed_files.append(fcc_file.filename)
+
+    if failed_files:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to upload: {', '.join(failed_files)}",
+        }), 500
 
     return jsonify({"success": True})
 
