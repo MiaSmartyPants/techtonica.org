@@ -9,7 +9,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseUpload
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 load_dotenv()
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
